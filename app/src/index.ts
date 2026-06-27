@@ -2,6 +2,7 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger-output.json';
 import { sessionMiddleware } from './middleware/session';
+import pollRoutes from './routes/pollRoutes';
 
 
 
@@ -16,6 +17,8 @@ app.use(express.json());
 app.use(sessionMiddleware);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+app.use('/api/poll', pollRoutes);
 
 app.get('/', (req, res) => {
     if (req.session) {
