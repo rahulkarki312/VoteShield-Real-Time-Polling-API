@@ -2,10 +2,10 @@
   "swagger": "2.0",
   "info": {
     "title": "High Performance Polls API",
-    "description": "API for managing high-performance polls",
+    "description": "Redis Real Time Polls",
     "version": "1.0.0"
   },
-  "host": "localhost:3001",
+  "host": "localhost:3000",
   "basePath": "/",
   "schemes": [
     "http"
