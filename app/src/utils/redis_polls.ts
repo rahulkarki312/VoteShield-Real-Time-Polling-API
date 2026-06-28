@@ -1,3 +1,4 @@
+import { timeStamp } from 'console';
 import redis from '../lib/redis'
 
 
@@ -16,6 +17,7 @@ export const registerAnonymousVote = async (
 ): Promise<void> => {
   const voteKey = getPollKey(pollId, "votes");
   const votedKey = getPollKey(pollId, "voted");
+  const historyKey = getPollKey(pollId, "history");
   
 
   const voteEvent = JSON.stringify({
@@ -32,6 +34,9 @@ export const registerAnonymousVote = async (
   // Record the session ID in the voted set
   pipeline.sadd(votedKey, sessionId);
 
+  //   Track this vote in the history list (prepend and trim to 100 entries)
+  pipeline.lpush(historyKey, voteEvent);
+  pipeline.ltrim(historyKey, 0, 99);
 
   await pipeline.exec(); // Execute both operations together
 };

@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "swagger": "ts-node src/swagger.ts",
-    "dev": "npm run swagger && prisma generate && ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev-old": "npm run swagger && prisma generate && ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "npm run swagger && prisma generate && ts-node-dev --poll --transpile-only --files src/index.ts"
   },
   "keywords": [],
   "author": "",
