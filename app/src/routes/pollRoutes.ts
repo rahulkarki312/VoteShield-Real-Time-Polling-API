@@ -2,9 +2,47 @@ import {z} from "zod"; // Importing Zod for schema validation
 
 import express from 'express';
  import {prisma} from '../lib/prisma';
+import { hasSessionVoted, recordVoteSession, registerAnonymousVote } from "../utils/redis_polls";
 
  const router = express.Router();
 
+
+router.post("/:id/vote", async (req: Request, res: Response) => {
+  const pollIdRaw = req.params.id;
+
+  if(!/^\d+$/.test(pollIdRaw)) {
+    res.status(400).json({ error: "Invalid poll ID. ID must be a number." });
+    return;
+  }
+
+  const pollId = parseInt(pollIdRaw, 10);
+  const { option } = req.body;
+
+  if(!option || !/^\d+$/.test(option)) {
+    res.status(400).json({ error: "Invalid option. Option must be a numeric string." });
+    return;
+  }
+
+  const sessionId = req.sessionID;
+
+  try{
+     // Check if this session has already voted on this poll
+    const alreadyVoted = await hasSessionVoted(pollId, sessionId);
+    if (alreadyVoted) {
+      res.status(403).json({ error: "You have already voted in this poll." });
+      return;
+    }
+
+    await registerAnonymousVote(pollId, option, sessionId);
+
+    res.status(201).json({ message: "Vote registered successfully" });
+    return;
+  }catch(err){
+    console.error("Error registering vote:", err);
+    res.status(500).json({ error: "Failed to register vote" });
+    return;
+  }
+});
 
  // Define the Zod schema for poll creation request body
 const pollSchema = z.object({

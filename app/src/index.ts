@@ -2,7 +2,9 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger-output.json';
 import { sessionMiddleware } from './middleware/session';
+
 import pollRoutes from './routes/pollRoutes';
+import { userStatusMiddleware } from './middleware/userStatus';
 
 
 
@@ -15,6 +17,8 @@ app.set("trust proxy", true);
 app.use(express.json());
 
 app.use(sessionMiddleware);
+
+app.use(userStatusMiddleware);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
