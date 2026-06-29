@@ -3,6 +3,7 @@ import {z} from "zod"; // Importing Zod for schema validation
 import express from 'express';
  import {prisma} from '../lib/prisma';
 import { hasSessionVoted, recordVoteSession, registerAnonymousVote } from "../utils/redis_polls";
+import { isPollActive } from "../utils/pollStatus";
 
  const router = express.Router();
 
@@ -26,6 +27,14 @@ router.post("/:id/vote", async (req: Request, res: Response) => {
   const sessionId = req.sessionID;
 
   try{
+
+    const active = await isPollActive(pollId);
+    
+    if(!active){
+      res.status(403).json({error: "This poll is not active."});
+      return;
+    }
+
      // Check if this session has already voted on this poll
     const alreadyVoted = await hasSessionVoted(pollId, sessionId);
     if (alreadyVoted) {
