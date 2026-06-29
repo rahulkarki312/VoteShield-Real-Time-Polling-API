@@ -5,6 +5,8 @@ import { sessionMiddleware } from './middleware/session';
 
 import pollRoutes from './routes/pollRoutes';
 import { userStatusMiddleware } from './middleware/userStatus';
+import { ipRateLimiter } from './middleware/ipRateLimiter';
+import { asyncHandler } from './utils/asyncHandler';
 
 
 
@@ -17,6 +19,8 @@ app.set("trust proxy", true);
 app.use(express.json());
 
 app.use(sessionMiddleware);
+
+app.use(asyncHandler(ipRateLimiter));
 
 app.use(userStatusMiddleware);
 
